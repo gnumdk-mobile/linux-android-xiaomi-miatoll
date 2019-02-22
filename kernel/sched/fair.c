@@ -9747,6 +9747,7 @@ static void detach_task(struct task_struct *p, struct lb_env *env)
 
 	p->on_rq = TASK_ON_RQ_MIGRATING;
 	deactivate_task(env->src_rq, p, DEQUEUE_NOCLOCK);
+	lockdep_off();
 #ifdef CONFIG_SCHED_WALT
 	double_lock_balance(env->src_rq, env->dst_rq);
 	if (!(env->src_rq->clock_update_flags & RQCF_UPDATED))
@@ -9756,6 +9757,7 @@ static void detach_task(struct task_struct *p, struct lb_env *env)
 #else
 	set_task_cpu(p, env->dst_cpu);
 #endif
+	lockdep_on();
 }
 
 /*
