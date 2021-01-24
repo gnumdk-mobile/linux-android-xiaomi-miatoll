@@ -77,6 +77,13 @@ int suid_dumpable = 0;
 static LIST_HEAD(formats);
 static DEFINE_RWLOCK(binfmt_lock);
 
+#define BIG_BIN_COUNT 3
+const char *BIG_BIN_PREFIX[] = {
+	"/vendor/bin/hw/android.hardware.graphics.composer",
+	"/usr/bin/pulseaudio",
+	"/usr/lib/audiosystem-passthrough/audiosystem-passthrough"
+};
+
 void __register_binfmt(struct linux_binfmt * fmt, int insert)
 {
 	BUG_ON(!fmt);
@@ -1716,6 +1723,7 @@ static int do_execveat_common(int fd, struct filename *filename,
 	struct file *file;
 	struct files_struct *displaced;
 	int retval;
+	int i;
 
 	if (IS_ERR(filename))
 		return PTR_ERR(filename);
@@ -1832,6 +1840,17 @@ static int do_execveat_common(int fd, struct filename *filename,
 	retval = exec_binprm(bprm);
 	if (retval < 0)
 		goto out;
+
+	for (i = 0; i < BIG_BIN_COUNT; i++) {
+		if (unlikely(!strncmp(filename->name,
+				      BIG_BIN_PREFIX[i],
+				      strlen(BIG_BIN_PREFIX[i])))) {
+			current->pc_flags |= PC_PERF_AFFINE;
+			set_cpus_allowed_ptr(current, cpu_perf_mask);
+			pr_info("Boosting %s", filename->name);
+			break;
+		}
+	}
 
 	/* execve succeeded */
 	current->fs->in_exec = 0;
