@@ -3281,7 +3281,7 @@ void walt_irq_work(struct irq_work *irq_work)
 	 */
 	if (!is_migration) {
 		if (sched_ravg_window != new_sched_ravg_window) {
-			printk_deferred("ALERT: changing window size from %u to %u\n",
+			pr_debug("ALERT: changing window size from %u to %u\n",
 					sched_ravg_window,
 					new_sched_ravg_window);
 			sched_ravg_window = new_sched_ravg_window;
