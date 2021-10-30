@@ -72,6 +72,7 @@ static struct hlist_head *orphan_list[] = {
 	NULL,
 };
 
+
 /***    private data structures    ***/
 
 struct clk_core {
