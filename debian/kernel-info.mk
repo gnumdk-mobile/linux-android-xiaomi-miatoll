@@ -32,7 +32,7 @@ KERNEL_IMAGE_WITH_DTB = 1
 # Path to the DTB
 # If you leave this undefined, an attempt to find it automatically
 # will be made.
-#KERNEL_IMAGE_DTB = arch/arm64/boot/dts/qcom/my_dtb.dtb
+KERNEL_IMAGE_DTB = arch/arm64/boot/dts/qcom/joyeuse-atoll-ab-idp-overlay.dtbo arch/arm64/boot/dts/qcom/gram-atoll-ab-idp-overlay.dtbo arch/arm64/boot/dts/qcom/excalibur-atoll-ab-idp-overlay.dtbo arch/arm64/boot/dts/qcom/curtana-atoll-ab-idp-overlay.dtbo
 
 # Whether to include a DTB Overlay. Use 0 (no) or 1.
 KERNEL_IMAGE_WITH_DTB_OVERLAY = 1
@@ -45,7 +45,7 @@ KERNEL_IMAGE_WITH_DTB_OVERLAY = 1
 # Whether to include the DTB Overlay into the kernel image
 # Use 0 (no, default) or 1.
 # dtbo.img will always be shipped in the linux-bootimage- package.
-KERNEL_IMAGE_WITH_DTB_OVERLAY_IN_KERNEL = 0
+KERNEL_IMAGE_WITH_DTB_OVERLAY_IN_KERNEL = 1
 
 # Path to a specifc configuration file for mkdtboimg.
 # The default is to leave it undefined.
