@@ -32,20 +32,19 @@ KERNEL_IMAGE_WITH_DTB = 1
 # Path to the DTB
 # If you leave this undefined, an attempt to find it automatically
 # will be made.
-KERNEL_IMAGE_DTB = arch/arm64/boot/dts/qcom/joyeuse-atoll-ab-idp-overlay.dtbo arch/arm64/boot/dts/qcom/gram-atoll-ab-idp-overlay.dtbo arch/arm64/boot/dts/qcom/excalibur-atoll-ab-idp-overlay.dtbo arch/arm64/boot/dts/qcom/curtana-atoll-ab-idp-overlay.dtbo
-
+KERNEL_IMAGE_DTB = arch/arm64/boot/dts/qcom/*.dtb
 # Whether to include a DTB Overlay. Use 0 (no) or 1.
 KERNEL_IMAGE_WITH_DTB_OVERLAY = 1
 
 # Path to the DTB overlay.
 # If you leave this undefined, an attempt to find it automatically
 # will be made.
-#KERNEL_IMAGE_DTB_OVERLAY = arch/arm64/boot/dts/qcom/my_overlay.dtbo
+KERNEL_IMAGE_DTB_OVERLAY = arch/arm64/boot/dts/qcom/*.dtbo
 
 # Whether to include the DTB Overlay into the kernel image
 # Use 0 (no, default) or 1.
 # dtbo.img will always be shipped in the linux-bootimage- package.
-KERNEL_IMAGE_WITH_DTB_OVERLAY_IN_KERNEL = 1
+KERNEL_IMAGE_WITH_DTB_OVERLAY_IN_KERNEL = 0
 
 # Path to a specifc configuration file for mkdtboimg.
 # The default is to leave it undefined.
@@ -70,6 +69,7 @@ KERNEL_BOOTIMAGE_TAGS_OFFSET = 0x100
 # Devices launched with Android 10: version 2
 # Devices launched with Android 11: version 2 or 3 (GKI)
 KERNEL_BOOTIMAGE_VERSION = 2
+KERNEL_BOOTIMAGE_DTB_OFFSET = 0x1f00000
 
 ########################################################################
 # Android verified boot
@@ -146,7 +146,10 @@ BUILD_PATH = /usr/lib/llvm-android-6.0-4691093/bin
 # Extra packages to add to the Build-Depends section. Mainline builds
 # can have this section empty, unless cross-building.
 # The default is enough to install the Android toolchain, including clang.
-DEB_TOOLCHAIN = linux-initramfs-halium-generic:arm64, binutils-aarch64-linux-gnu, clang-android-6.0-4691093, gcc-4.9-aarch64-linux-android, g++-4.9-aarch64-linux-android, libgcc-4.9-dev-aarch64-linux-android-cross
+#DEB_TOOLCHAIN = linux-initramfs-halium-generic:arm64, binutils-aarch64-linux-gnu, clang-android-6.0-4691093, gcc-4.9-aarch64-linux-android, g++-4.9-aarch64-linux-android, libgcc-4.9-dev-aarch64-linux-android-cross
+
+# No halium-initramfs with support for dynamic partitions. The one from ubuntu touch needs to be used instead.
+DEB_TOOLCHAIN = binutils-aarch64-linux-gnu, clang-android-6.0-4691093, gcc-4.9-aarch64-linux-android, g++-4.9-aarch64-linux-android, libgcc-4.9-dev-aarch64-linux-android-cross
 
 # Where we're building on
 DEB_BUILD_ON = amd64
