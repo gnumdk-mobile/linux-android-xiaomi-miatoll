@@ -8,7 +8,7 @@
 VARIANT = android
 
 # Kernel base version
-KERNEL_BASE_VERSION = 4.14-254
+KERNEL_BASE_VERSION = 4.14-257
 
 # The kernel cmdline to use
 KERNEL_BOOTIMAGE_CMDLINE = console=ttyMSM0,115200n8 earlycon=msm_geni_serial,0xa88000 androidboot.hardware=qcom androidboot.console=ttyMSM0 androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=1 loop.max_part=7 buildvariant=user console=tty0 datapart=/dev/sda18
