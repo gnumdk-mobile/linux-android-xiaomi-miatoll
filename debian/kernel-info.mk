@@ -110,6 +110,9 @@ FLASH_IS_LEGACY_DEVICE = 0
 # FLASH_INFO_CPU will be checked instead.
 FLASH_INFO_MANUFACTURER =
 
+# Space-separated list of supported device ids as reported by fastboot
+FLASH_INFO_DEVICE_IDS = joyeuse curtana excalibur gram
+
 # Device model. This must match the `ro.product.vendor.model`
 # Android property. If you don't want to specify this, leave it undefined,
 # FLASH_INFO_CPU will be checked instead.
