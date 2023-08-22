@@ -9,6 +9,13 @@ config VIDEO_V4L2
 	select RATIONAL
 	default (I2C || I2C=n) && VIDEO_DEV
 
+config V4L2_LOOPBACK
+	tristate "v4l2loopback driver"
+	---help---
+	Enable v4l2loopback support, it allows to create
+	"virtual video devices". Normal (v4l2) applications will
+	read these devices as if they were ordinary video devices.
+
 config VIDEO_ADV_DEBUG
 	bool "Enable advanced debug functionality on V4L2 drivers"
 	default n
