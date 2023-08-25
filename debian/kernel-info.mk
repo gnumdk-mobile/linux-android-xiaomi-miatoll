@@ -24,7 +24,7 @@ DEVICE_MODEL = miatoll
 DEVICE_FULL_NAME = Xiaomi Miatoll
 
 # Defconfig to use
-KERNEL_DEFCONFIG = cust_defconfig
+KERNEL_DEFCONFIG = droidian_defconfig
 
 # Whether to include DTBs with the image. Use 0 (no) or 1.
 KERNEL_IMAGE_WITH_DTB = 1
@@ -33,6 +33,7 @@ KERNEL_IMAGE_WITH_DTB = 1
 # If you leave this undefined, an attempt to find it automatically
 # will be made.
 KERNEL_IMAGE_DTB = arch/arm64/boot/dts/qcom/*.dtb
+
 # Whether to include a DTB Overlay. Use 0 (no) or 1.
 KERNEL_IMAGE_WITH_DTB_OVERLAY = 1
 

@@ -61,11 +61,6 @@ modules.builtin
 /*.spec
 
 #
-# Debian directory (make deb-pkg)
-#
-/debian/
-
-#
 # tar directory (make tar*-pkg)
 #
 /tar-install/
