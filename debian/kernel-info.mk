@@ -24,7 +24,7 @@ DEVICE_MODEL = miatoll
 DEVICE_FULL_NAME = Xiaomi Miatoll
 
 # Defconfig to use
-KERNEL_DEFCONFIG = droidian_defconfig
+KERNEL_DEFCONFIG = gnumdk_defconfig
 
 # Whether to include DTBs with the image. Use 0 (no) or 1.
 KERNEL_IMAGE_WITH_DTB = 1
