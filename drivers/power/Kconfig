@@ -1,3 +1,152 @@
 source "drivers/power/avs/Kconfig"
 source "drivers/power/reset/Kconfig"
 source "drivers/power/supply/Kconfig"
+
+config POWER_SAVER
+    bool "Save power when screen is off"
+    help
+	This allow to save power when screen is off and enhance performance when screen is on.
+
+config POWER_SAVER_SCREEN_ON_CPU_MIN_FREQ_LITTLE
+    int "Screen on minimum frequency for the little cluster"
+    default 0
+    help
+      This sets the screen on minimum frequency (in kHz) for the little CPU
+      cluster.
+
+      If in doubt, check https://github.com/kdrag0n/freqbench.
+
+config POWER_SAVER_SCREEN_ON_CPU_MIN_FREQ_BIG
+    int "Screen on minimum frequency for the big cluster"
+    default 0
+    help
+      This sets the screen on minimum frequency (in kHz) for the big CPU
+      cluster.
+
+      If in doubt, check https://github.com/kdrag0n/freqbench.
+
+config POWER_SAVER_SCREEN_ON_CPU_MIN_FREQ_PRIME
+    int "Screen on minimum frequency for the prime cluster"
+    default 0
+    help
+      This sets the screen on minimum frequency (in kHz) for the prime CPU
+      cluster. Ignore if no such cluster.
+
+      If in doubt, check https://github.com/kdrag0n/freqbench.
+
+config POWER_SAVER_SCREEN_OFF_CPU_MAX_FREQ_LITTLE
+    int "Screen off maximum frequency for the little cluster"
+    default 0
+    help
+      This sets the screen off maximum frequency (in kHz) for the little CPU
+      cluster.
+
+      If in doubt, check https://github.com/kdrag0n/freqbench.
+
+config POWER_SAVER_SCREEN_OFF_CPU_MAX_FREQ_BIG
+    int "Screen off maximum frequency for the big cluster"
+    default 0
+    help
+      This sets the screen off maximum frequency (in kHz) for the big CPU
+      cluster.
+
+      If in doubt, check https://github.com/kdrag0n/freqbench.
+
+config POWER_SAVER_SCREEN_OFF_CPU_MAX_FREQ_PRIME
+    int "Screen off maximumfrequency for the prime cluster"
+    default 0
+    help
+      This sets the screen off maximum frequency (in kHz) for the prime CPU
+      cluster. Ignore if no such cluster.
+
+      If in doubt, check https://github.com/kdrag0n/freqbench.
+
+config POWER_SAVER_SCREEN_OFF_LLCC_DDR_BW
+    int "Screen off frequency for cpu-llcc-ddr-bw device"
+    default 0
+    help
+	"Screen off LLCC DDR bandwith"
+
+config POWER_SAVER_SCREEN_OFF_DDR_LATFLOOR
+    int "Screen off frequency for cpu-ddr-latfloor device"
+    default 0
+    help
+	"Screen off DDR latency"
+
+config POWER_SAVER_SCREEN_OFF_LLCC_DDR_LAT
+    int "Screen off frequency for llcc-ddr-lat device"
+    default 0
+    help
+	"Screen off LLCC DDR latency"
+
+config POWER_SAVER_SCREEN_OFF_CPU_LLCC_BW
+    int "Screen off frequency for cpu-llcc-bw device"
+    default 0
+    help
+	"Screen off LLCC bandwith"
+
+config POWER_SAVER_SCREEN_OFF_CPU_LLCC_LAT
+    int "Screen off frequency for cpu-llcc-lat device"
+    default 0
+    help
+	"Screen off LLCC latency"
+
+config POWER_SAVER_SCREEN_ON_SWAPPINESS
+   int "Screen on relative IO cost of swapping and filesystem paging"
+   default 90
+   help
+	"This control is used to define the rough relative IO cost of swapping and filesystem paging, as a value between 0 and 200. At 100, the VM assumes equal IO cost and will thus apply memory pressure to the page cache and swap-backed pages equally; lower values signify more expensive swap IO, higher values indicates cheaper."
+
+config POWER_SAVER_SCREEN_ON_DIRTY_EXPIRE_CENTISECS
+   int "Screen on kernel flusher threads timeout"
+   default 3000
+   help
+        "This tunable is used to define when dirty data is old enough to be eligible for writeout by the kernel flusher threads. It is expressed in 100’ths of a second. Data which has been dirty in-memory for longer than this interval will be written out next time a flusher thread wakes up."
+
+config POWER_SAVER_SCREEN_ON_DIRTY_WRITEBACK_CENTISECS
+   int "Screen on kernel flusher threads wakeup timeout"
+   default 1500
+   help
+	"The kernel flusher threads will periodically wake up and write old data out to disk. This tunable expresses the interval between those wakeups, in 100’ths of a second."
+
+config POWER_SAVER_SCREEN_ON_DIRTY_BACKGROUND_RATIO
+   int "Screen on percentage number of pages at which the background kernel flusher threads will start writing out dirty data."
+   default 10
+   help
+	"Contains, as a percentage of total available memory that contains free pages and reclaimable pages, the number of pages at which the background kernel flusher threads will start writing out dirty data."
+
+config POWER_SAVER_SCREEN_ON_DIRTY_RATIO
+   int "Screen on percentage number of pages at which a process which is generating disk writes will itself start writing out dirty data."
+   default 20
+   help
+	"Contains, as a percentage of total available memory that contains free pages and reclaimable pages, the number of pages at which a process which is generating disk writes will itself start writing out dirty data."
+
+config POWER_SAVER_SCREEN_OFF_SWAPPINESS
+   int "Screen off relative IO cost of swapping and filesystem paging"
+   default 10
+   help
+	"This control is used to define the rough relative IO cost of swapping and filesystem paging, as a value between 0 and 200. At 100, the VM assumes equal IO cost and will thus apply memory pressure to the page cache and swap-backed pages equally; lower values signify more expensive swap IO, higher values indicates cheaper."
+
+config POWER_SAVER_SCREEN_OFF_DIRTY_EXPIRE_CENTISECS
+   int "Screen off kernel flusher threads timeout"
+   default 0
+   help
+        "This tunable is used to define when dirty data is old enough to be eligible for writeout by the kernel flusher threads. It is expressed in 100’ths of a second. Data which has been dirty in-memory for longer than this interval will be written out next time a flusher thread wakes up."
+
+config POWER_SAVER_SCREEN_OFF_DIRTY_WRITEBACK_CENTISECS
+   int "Screen off kernel flusher threads wakeup timeout"
+   default 0
+   help
+	"The kernel flusher threads will periodically wake up and write old data out to disk. This tunable expresses the interval between those wakeups, in 100’ths of a second."
+
+config POWER_SAVER_SCREEN_OFF_DIRTY_BACKGROUND_RATIO
+   int "Screen off percentage number of pages at which the background kernel flusher threads will start writing out dirty data."
+   default 60
+   help
+	"Contains, as a percentage of total available memory that contains free pages and reclaimable pages, the number of pages at which the background kernel flusher threads will start writing out dirty data."
+
+config POWER_SAVER_SCREEN_OFF_DIRTY_RATIO
+   int "Screen off percentage number of pages at which a process which is generating disk writes will itself start writing out dirty data."
+   default 95
+   help
+	"Contains, as a percentage of total available memory that contains free pages and reclaimable pages, the number of pages at which a process which is generating disk writes will itself start writing out dirty data."
