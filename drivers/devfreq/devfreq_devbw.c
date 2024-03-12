@@ -32,6 +32,8 @@
 #include <linux/msm-bus.h>
 #include <linux/msm-bus-board.h>
 
+#include <power/power_saver.h>
+
 /* Has to be ULL to prevent overflow where this macro is used. */
 #define MBYTE (1ULL << 20)
 #define MAX_PATHS	2
@@ -236,6 +238,8 @@ int devfreq_add_devbw(struct device *dev)
 		msm_bus_scale_unregister_client(d->bus_client);
 		return PTR_ERR(d->df);
 	}
+
+	power_saver_register_devfreq(d->df, dev_name(dev));
 
 	return 0;
 }

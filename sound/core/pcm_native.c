@@ -39,6 +39,8 @@
 #include <linux/uio.h>
 #include <linux/delay.h>
 
+#include <power/power_saver.h>
+
 #include "pcm_local.h"
 
 #ifdef CONFIG_SND_DEBUG
@@ -1223,6 +1225,9 @@ static int snd_pcm_pre_start(struct snd_pcm_substream *substream, int state)
 	    !substream->hw_no_buffer &&
 	    !snd_pcm_playback_data(substream))
 		return -EPIPE;
+#ifdef CONFIG_POWER_SAVER
+	power_saver.sound_enabled();
+#endif
 	runtime->trigger_tstamp_latched = false;
 	runtime->trigger_master = substream;
 	return 0;
@@ -1336,6 +1341,9 @@ static void snd_pcm_post_stop(struct snd_pcm_substream *substream, int state)
 		snd_pcm_trigger_tstamp(substream);
 		runtime->status->state = state;
 		snd_pcm_timer_notify(substream, SNDRV_TIMER_EVENT_MSTOP);
+#ifdef CONFIG_POWER_SAVER
+	power_saver.sound_disabled();
+#endif
 	}
 	wake_up(&runtime->sleep);
 	wake_up(&runtime->tsleep);
@@ -1412,6 +1420,9 @@ static int snd_pcm_pre_pause(struct snd_pcm_substream *substream, int push)
 			return -EBADFD;
 	} else if (runtime->status->state != SNDRV_PCM_STATE_PAUSED)
 		return -EBADFD;
+#ifdef CONFIG_POWER_SAVER
+	power_saver.sound_enabled();
+#endif
 	runtime->trigger_master = substream;
 	return 0;
 }
@@ -1451,6 +1462,9 @@ static void snd_pcm_post_pause(struct snd_pcm_substream *substream, int push)
 		snd_pcm_timer_notify(substream, SNDRV_TIMER_EVENT_MPAUSE);
 		wake_up(&runtime->sleep);
 		wake_up(&runtime->tsleep);
+#ifdef CONFIG_POWER_SAVER
+	power_saver.sound_disabled();
+#endif
 	} else {
 		runtime->status->state = SNDRV_PCM_STATE_RUNNING;
 		snd_pcm_timer_notify(substream, SNDRV_TIMER_EVENT_MCONTINUE);
