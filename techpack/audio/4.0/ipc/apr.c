@@ -1115,11 +1115,6 @@ static int __init apr_debug_init(void)
 						 &apr_debug_ops);
 	return 0;
 }
-#else
-static int __init apr_debug_init(void)
-(
-	return 0;
-)
 #endif
 
 static void apr_cleanup(void)
@@ -1140,7 +1135,9 @@ static void apr_cleanup(void)
 				mutex_destroy(&client[i][j].svc[k].m_lock);
 		}
 	}
+#ifdef CONFIG_DEBUG_FS
 	debugfs_remove(debugfs_apr_debug);
+#endif
 }
 
 static int apr_probe(struct platform_device *pdev)
@@ -1211,7 +1208,11 @@ static int apr_probe(struct platform_device *pdev)
 		ret = 0;
 	}
 
+#ifdef CONFIG_DEBUG_FS
 	return apr_debug_init();
+#else
+	return 0;
+#endif
 }
 
 static int apr_remove(struct platform_device *pdev)

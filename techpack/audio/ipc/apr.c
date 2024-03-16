@@ -1114,21 +1114,6 @@ static struct notifier_block modem_service_nb = {
 	.priority = 0,
 };
 
-#ifdef CONFIG_DEBUG_FS
-static int __init apr_debug_init(void)
-{
-	debugfs_apr_debug = debugfs_create_file("msm_apr_debug",
-						 S_IFREG | 0444, NULL, NULL,
-						 &apr_debug_ops);
-	return 0;
-}
-#else
-static int __init apr_debug_init(void)
-(
-	return 0;
-)
-#endif
-
 static void apr_cleanup(void)
 {
 	int i, j, k;
@@ -1218,7 +1203,7 @@ static int apr_probe(struct platform_device *pdev)
 		ret = 0;
 	}
 
-	return apr_debug_init();
+	return 0;
 }
 
 static int apr_remove(struct platform_device *pdev)
