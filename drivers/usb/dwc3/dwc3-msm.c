@@ -4166,8 +4166,6 @@ static void msm_dwc3_perf_vote_update(struct dwc3_msm *mdwc, bool perf_mode)
 						PM_QOS_DEFAULT_VALUE);
 
 	curr_perf_mode = perf_mode;
-	pr_debug("%s: latency updated to: %d\n", __func__,
-			perf_mode ? latency : PM_QOS_DEFAULT_VALUE);
 }
 
 static void msm_dwc3_perf_vote_work(struct work_struct *w)
@@ -4180,9 +4178,6 @@ static void msm_dwc3_perf_vote_work(struct work_struct *w)
 
 	if (dwc->irq_cnt - last_irq_cnt >= PM_QOS_THRESHOLD)
 		in_perf_mode = true;
-
-	pr_debug("%s: in_perf_mode:%u, interrupts in last sample:%lu\n",
-		 __func__, in_perf_mode, (dwc->irq_cnt - last_irq_cnt));
 
 	last_irq_cnt = dwc->irq_cnt;
 	msm_dwc3_perf_vote_update(mdwc, in_perf_mode);
