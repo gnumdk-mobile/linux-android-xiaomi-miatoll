@@ -660,9 +660,6 @@ static int qg_vbat_low_wa(struct qpnp_qg *chip)
 		for (i = 0; i < chip->kdata.fifo_length; i++) {
 			if (chip->kdata.fifo[i].v > vbat_low_uv) {
 				chip->vbat_low = false;
-				pr_info("Exit VBAT_LOW vbat_avg=%duV vbat_low=%duV updated fifo_length=%d\n",
-					chip->kdata.fifo[i].v, vbat_low_uv,
-					chip->dt.s2_fifo_length);
 				break;
 			}
 		}
@@ -1140,13 +1137,6 @@ static void process_udata_work(struct work_struct *work)
 	if (chip->udata.param[QG_SOC].valid ||
 			chip->udata.param[QG_SYS_SOC].valid) {
 
-		qg_dbg(chip, QG_DEBUG_SOC, "udata update: QG_SOC=%d QG_SYS_SOC=%d last_catchup_soc=%d\n",
-				chip->udata.param[QG_SOC].valid ?
-				chip->udata.param[QG_SOC].data : -EINVAL,
-				chip->udata.param[QG_SYS_SOC].valid ?
-				chip->udata.param[QG_SYS_SOC].data : -EINVAL,
-				chip->catch_up_soc);
-
 		if (chip->udata.param[QG_SYS_SOC].valid) {
 			chip->sys_soc = chip->udata.param[QG_SYS_SOC].data;
 			chip->catch_up_soc = qg_adjust_sys_soc(chip);
@@ -1192,10 +1182,6 @@ static void process_udata_work(struct work_struct *work)
 	if ((batt_temp > 600) && is_batt_available(chip))
 		power_supply_changed(chip->batt_psy);
 
-	qg_dbg(chip, QG_DEBUG_STATUS, "udata update: batt_soc=%d cc_soc=%d full_soc=%d qg_esr=%d batt_temp=%d\n",
-		(chip->batt_soc != INT_MIN) ? chip->batt_soc : -EINVAL,
-		(chip->cc_soc != INT_MIN) ? chip->cc_soc : -EINVAL,
-		chip->full_soc, chip->esr_last, batt_temp);
 	vote(chip->awake_votable, UDATA_READY_VOTER, false, 0);
 }
 
@@ -1318,8 +1304,6 @@ static irqreturn_t qg_vbat_empty_handler(int irq, void *data)
 	if ((status & BATTERY_MISSING_INT_RT_STS_BIT) ||
 			chip->battery_missing)
 		return IRQ_HANDLED;
-
-	pr_warn("VBATT EMPTY SOC = 0\n");
 
 	chip->catch_up_soc = 0;
 	qg_scale_soc(chip, true);
@@ -2010,7 +1994,6 @@ static int qg_get_ffc_iterm_for_qg(struct qpnp_qg *chip)
 	int ffc_qg_iterm = 0;
 
 	ffc_qg_iterm = FFC_BATT_FULL_CURRENT;
-	pr_info("ffc_batt_full_current=%d\n", ffc_qg_iterm);
 
 	return ffc_qg_iterm;
 }
@@ -2025,7 +2008,6 @@ static int qg_get_ffc_iterm_for_chg(struct qpnp_qg *chip)
 		pr_err("Set ffc_chg_iterm = %d\n",chip->bp.ffc_chg_term_current );
 		ffc_chg_iterm = chip->bp.ffc_chg_term_current;
 	}
-	pr_err("Set ffc_chg_iterm = %d\n", ffc_chg_iterm );
 	return ffc_chg_iterm;
 }
 
@@ -2039,11 +2021,9 @@ static int qg_psy_set_property(struct power_supply *psy,
 	switch (psp) {
 	case POWER_SUPPLY_PROP_CHARGE_FULL:
 		if (chip->dt.cl_disable) {
-			pr_warn("Capacity learning disabled!\n");
 			return 0;
 		}
 		if (chip->cl->active) {
-			pr_warn("Capacity learning active!\n");
 			return 0;
 		}
 		if (pval->intval <= 0 || pval->intval > chip->cl->nom_cap_uah) {
@@ -2629,12 +2609,10 @@ static int qg_battery_status_update(struct qpnp_qg *chip)
 	}
 
 	if (chip->battery_missing && prop.intval) {
-		pr_warn("Battery inserted!\n");
 		rc = qg_handle_battery_insertion(chip);
 		if (rc < 0)
 			pr_err("Failed in battery-insertion rc=%d\n", rc);
 	} else if (!chip->battery_missing && !prop.intval) {
-		pr_warn("Battery removed!\n");
 		rc = qg_handle_battery_removal(chip);
 		if (rc < 0)
 			pr_err("Failed in battery-removal rc=%d\n", rc);
@@ -2852,8 +2830,6 @@ static void profile_load_work(struct work_struct *work)
 		qg_determine_pon_soc(chip);
 		qg_post_init(chip);
 		qg_get_battery_capacity(chip, &soc);
-		pr_info("profile_load_work: QG initialized! battery_profile=%s SOC=%d QG_subtype=%d\n",
-			qg_get_battery_type(chip), soc, chip->qg_subtype);
 	} else {
 		pr_err("profile_load_work is failed.\n");
 		retry_batt_profile++;
@@ -3674,9 +3650,6 @@ done:
 	rc = qg_store_soc_params(chip);
 	if (rc < 0)
 		pr_err("Failed to update sdam params rc=%d\n", rc);
-
-	pr_info("using %s @ PON ocv_uv=%duV soc=%d\n",
-			ocv_type, ocv_uv, chip->msoc);
 
 	/* SOC reporting is now ready */
 	chip->soc_reporting_ready = 1;
@@ -4634,7 +4607,7 @@ static void calculate_average_current(struct qpnp_qg *chip)
 
 	/* only continue if ibat has changed */
 	if (chip->param.batt_ma == chip->param.batt_ma_prev)
-		goto unchanged;
+		return;
 	else
 		chip->param.batt_ma_prev = chip->param.batt_ma;
 
@@ -4649,15 +4622,10 @@ static void calculate_average_current(struct qpnp_qg *chip)
 		iavg_ma = 0;
 		/* maintain a AVG_SAMPLES sample average of ibat */
 		for (i = 0; i < chip->param.samples_num; i++) {
-			pr_debug("iavg_samples_ma[%d] = %d\n", i, chip->param.batt_ma_avg_samples[i]);
 			iavg_ma += chip->param.batt_ma_avg_samples[i];
 		}
 		chip->param.batt_ma_avg = DIV_ROUND_CLOSEST(iavg_ma, chip->param.samples_num);
 	}
-
-unchanged:
-	pr_info("current_now_ma = %d, averaged_iavg_ma = %d\n",
-			chip->param.batt_ma, chip->param.batt_ma_avg);
 }
 
 
@@ -4704,10 +4672,6 @@ static void qg_battery_soc_smooth_tracking(struct qpnp_qg *chip)
 		delta_time = 0;
 
 	soc_changed = min(1, delta_time);
-
-	pr_info("soc:%d, last_soc:%d, raw_soc:%d, soc_changed:%d, update_now:%d, charge_status:%d, batt_ma:%d\n",
-			chip->param.batt_soc, last_batt_soc, chip->param.batt_raw_soc, soc_changed, chip->param.update_now,
-			chip->charge_status, chip->param.batt_ma);
 
 	if (last_batt_soc >= 0) {
 		if (last_batt_soc != FULL_SOC && chip->param.batt_raw_soc >= FORCE_TO_FULL_SOC && chip->charge_status == POWER_SUPPLY_STATUS_FULL)
@@ -4780,10 +4744,6 @@ static void soc_monitor_work(struct work_struct *work)
 
 	if (chip->soc_reporting_ready)
 		qg_battery_soc_smooth_tracking(chip);
-
-	pr_err("soc:%d, raw_soc:%d, c:%d, s:%d\n",
-			chip->param.batt_soc, chip->param.batt_raw_soc,
-			chip->param.batt_ma, chip->charge_status);
 
 	schedule_delayed_work(&chip->soc_monitor_work, msecs_to_jiffies(MONITOR_SOC_WAIT_PER_MS));
 }
@@ -5331,8 +5291,6 @@ static int qpnp_qg_probe(struct platform_device *pdev)
 	schedule_delayed_work(&chip->force_shutdown_work, msecs_to_jiffies(URGENT_DELAY_MS));
 
 	qg_get_battery_capacity(chip, &soc);
-	pr_info("QG initialized! battery_profile=%s SOC=%d QG_subtype=%d\n",
-			qg_get_battery_type(chip), soc, chip->qg_subtype);
 
 	return rc;
 

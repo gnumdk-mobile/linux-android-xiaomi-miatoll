@@ -78,8 +78,6 @@ static int qg_process_fvss_soc(struct qpnp_qg *chip, int sys_soc)
 		chip->last_fifo_v_uv = vbat_uv;
 
 	if (chip->last_fifo_v_uv > (chip->dt.fvss_vbat_mv * 1000)) {
-		qg_dbg(chip, QG_DEBUG_SOC, "FVSS: last_fifo_v=%d fvss_entry_uv=%d - exit\n",
-			chip->last_fifo_v_uv, chip->dt.fvss_vbat_mv * 1000);
 		goto exit_soc_scale;
 	}
 
@@ -119,11 +117,6 @@ static int qg_process_fvss_soc(struct qpnp_qg *chip, int sys_soc)
 	soc_fvss = ((soc_vbat * wt_vbat) + (sys_soc * wt_sys)) / 100;
 	soc_fvss = CAP(0, 100, soc_fvss);
 
-	qg_dbg(chip, QG_DEBUG_SOC, "FVSS: vbat_fvss_entry=%d soc_fvss_entry=%d cutoff_uv=%d vbat_uv=%d fifo_avg_v=%d soc_vbat=%d sys_soc=%d wt_vbat=%d wt_sys=%d soc_fvss=%d\n",
-			chip->vbat_fvss_entry, chip->soc_fvss_entry,
-			vbat_cutoff_uv, vbat_uv, chip->last_fifo_v_uv,
-			soc_vbat, sys_soc, wt_vbat, wt_sys, soc_fvss);
-
 	return soc_fvss;
 
 exit_soc_scale:
@@ -160,7 +153,6 @@ static int qg_process_tcss_soc(struct qpnp_qg *chip, int sys_soc)
 
 	 rc = power_supply_get_property(chip->batt_psy,
 			POWER_SUPPLY_PROP_STATUS, &prop);
-	 pr_err("charge_status = %d\n", prop.intval);
 	 if (rc < 0) {
 		pr_err("failed to get charge_status, rc = %d\n", rc);
 		goto exit_soc_scale;
@@ -191,9 +183,6 @@ static int qg_process_tcss_soc(struct qpnp_qg *chip, int sys_soc)
 	rc = power_supply_get_property(chip->batt_psy,
 			POWER_SUPPLY_PROP_INPUT_CURRENT_LIMITED, &prop);
 	if (!rc && prop.intval) {
-		qg_dbg(chip, QG_DEBUG_SOC,
-			"Input limited sys_soc=%d soc_tcss=%d\n",
-					sys_soc, chip->soc_tcss);
 		if (chip->soc_tcss > sys_soc)
 			sys_soc = chip->soc_tcss;
 		goto exit_soc_scale;
@@ -229,22 +218,12 @@ static int qg_process_tcss_soc(struct qpnp_qg *chip, int sys_soc)
 					(wt_sys * sys_soc), 10000);
 	chip->soc_tcss = CAP(QG_MIN_SOC, QG_MAX_SOC, chip->soc_tcss);
 
-	qg_dbg(chip, QG_DEBUG_SOC,
-		"TCSS: fifo_i=%d prev_fifo_i=%d ibatt_tcss_entry=%d qg_term=%d soc_tcss_entry=%d sys_soc=%d soc_ibat=%d wt_ibat=%d wt_sys=%d soc_tcss=%d\n",
-			chip->last_fifo_i_ua, chip->prev_fifo_i_ua,
-			chip->ibat_tcss_entry, qg_iterm_ua,
-			chip->soc_tcss_entry, sys_soc, soc_ibat,
-			wt_ibat, wt_sys, chip->soc_tcss);
-
 	return chip->soc_tcss;
 
 exit_soc_scale:
 	chip->tcss_entry_count = 0;
 skip_entry_count:
 	chip->tcss_active = false;
-	qg_dbg(chip, QG_DEBUG_SOC, "TCSS: Quit - enabled=%d sys_soc=%d tcss_entry_count=%d fifo_i_ua=%d\n",
-			chip->dt.tcss_enable, sys_soc, chip->tcss_entry_count,
-			chip->last_fifo_i_ua);
 	return sys_soc;
 }
 
@@ -268,11 +247,7 @@ int qg_adjust_sys_soc(struct qpnp_qg *chip)
 		soc = FULL_SOC;
 	} else {
 		soc = DIV_ROUND_CLOSEST(chip->sys_soc, 100);
-		pr_err ("cc_soc = %d, batt_soc = %d, sys_soc = %d, soc = %d", chip->cc_soc, chip->batt_soc, chip->sys_soc, soc);
 	}
-
-	qg_dbg(chip, QG_DEBUG_SOC, "sys_soc=%d adjusted sys_soc=%d\n",
-					chip->sys_soc, soc);
 
 	soc = qg_process_fvss_soc(chip, soc);
 
@@ -315,9 +290,6 @@ static void get_next_update_time(struct qpnp_qg *chip)
 					- SOC_SCALE_HYST_MS;
 	chip->next_wakeup_ms = max(chip->next_wakeup_ms,
 				min_delta_soc_interval_ms);
-
-	qg_dbg(chip, QG_DEBUG_SOC, "fifo_full_time=%d secs fifo_real_time=%d secs soc_scale_points=%d\n",
-			full_time_ms / 1000, rt_time_ms / 1000, soc_points);
 }
 
 static bool is_scaling_required(struct qpnp_qg *chip)
@@ -441,10 +413,6 @@ static void update_msoc(struct qpnp_qg *chip)
 			chip->charge_status, chip->charge_done,
 			input_present);
 
-	qg_dbg(chip, QG_DEBUG_SOC,
-		"SOC scale: Update maint_soc=%d msoc=%d catch_up_soc=%d delta_soc=%d\n",
-				chip->maint_soc, chip->msoc,
-				chip->catch_up_soc, chip->dt.delta_soc);
 }
 
 static void scale_soc_stop(struct qpnp_qg *chip)
@@ -452,9 +420,6 @@ static void scale_soc_stop(struct qpnp_qg *chip)
 	chip->next_wakeup_ms = 0;
 	alarm_cancel(&chip->alarm_timer);
 
-	qg_dbg(chip, QG_DEBUG_SOC,
-			"SOC scale stopped: msoc=%d catch_up_soc=%d\n",
-			chip->msoc, chip->catch_up_soc);
 }
 
 static void scale_soc_work(struct work_struct *work)
@@ -478,11 +443,6 @@ static void scale_soc_work(struct work_struct *work)
 		scale_soc_stop(chip);
 		goto done_psy;
 	}
-
-	qg_dbg(chip, QG_DEBUG_SOC,
-		"SOC scale: Work msoc=%d catch_up_soc=%d delta_soc=%d next_wakeup=%d sec\n",
-			chip->msoc, chip->catch_up_soc, chip->dt.delta_soc,
-			chip->next_wakeup_ms / 1000);
 
 done_psy:
 	power_supply_changed(chip->qg_psy);
@@ -510,18 +470,12 @@ int qg_scale_soc(struct qpnp_qg *chip, bool force_soc)
 
 	mutex_lock(&chip->soc_lock);
 
-	qg_dbg(chip, QG_DEBUG_SOC,
-			"SOC scale: Start msoc=%d catch_up_soc=%d delta_soc=%d\n",
-			chip->msoc, chip->catch_up_soc, chip->dt.delta_soc);
-
 	if (force_soc) {
 		chip->msoc = chip->catch_up_soc;
 		rc = qg_write_monotonic_soc(chip, chip->msoc);
 		if (rc < 0)
 			pr_err("Failed to update MSOC register rc=%d\n", rc);
 
-		qg_dbg(chip, QG_DEBUG_SOC,
-			"SOC scale: Forced msoc=%d\n", chip->msoc);
 		goto done_psy;
 	}
 
@@ -540,11 +494,6 @@ int qg_scale_soc(struct qpnp_qg *chip, bool force_soc)
 		scale_soc_stop(chip);
 		goto done_psy;
 	}
-
-	qg_dbg(chip, QG_DEBUG_SOC,
-		"SOC scale: msoc=%d catch_up_soc=%d delta_soc=%d next_wakeup=%d sec\n",
-			chip->msoc, chip->catch_up_soc, chip->dt.delta_soc,
-			chip->next_wakeup_ms / 1000);
 
 done_psy:
 	power_supply_changed(chip->qg_psy);

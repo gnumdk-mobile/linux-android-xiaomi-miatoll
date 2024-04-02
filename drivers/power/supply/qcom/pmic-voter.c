@@ -115,12 +115,6 @@ static void vote_min(struct votable *votable, int client_id,
 		}
 	}
 
-	if (strcmp(votable->name, "QG_WS") != 0) {
-		if(votable->votes[i].enabled)
-			pr_info("%s: val: %d\n", votable->client_strs[i],
-					votable->votes[i].value);
-	}
-
 	if (*eff_id == -EINVAL)
 		*eff_res = -EINVAL;
 }
@@ -495,12 +489,6 @@ int vote(struct votable *votable, const char *client_str, bool enabled, int val)
 	 */
 	if (!votable->voted_on
 			|| (effective_result != votable->effective_result)) {
-		if (strcmp(votable->name, "QG_WS") != 0) {
-			pr_info("%s: current vote is now %d voted by %s,%d, previous voted %d\n",
-				votable->name, effective_result,
-				get_client_str(votable, effective_id),
-				effective_id, votable->effective_result);
-		}
 		votable->effective_client_id = effective_id;
 		votable->effective_result = effective_result;
 		if (votable->callback && !votable->force_active
