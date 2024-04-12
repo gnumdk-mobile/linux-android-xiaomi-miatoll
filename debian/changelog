@@ -1,3 +1,9 @@
+linux-android-xiaomi-miatoll (4.14.336+gnumdk0++git20240412142255.37812be.gnumdk) trixie; urgency=medium
+
+  * Linux 4.14.336
+
+ -- Cédric Bellegarde <cedric.bellegarde@adishatz.org>  Fri, 12 Apr 2024 09:43:17 +0200
+
 linux-android-xiaomi-miatoll (4.14.288+droidian1+git20230825123337.ff750f3.bookworm) bookworm; urgency=medium
 
   * drivers: add v4l2loopback to the tree
