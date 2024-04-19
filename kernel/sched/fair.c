@@ -8705,6 +8705,7 @@ out:
 static inline bool nohz_kick_needed(struct rq *rq, bool only_update);
 static void nohz_balancer_kick(bool only_update);
 
+#ifndef CONFIG_SCHED_CASS
 /*
  * wake_energy: Make the decision if we want to use an energy-aware
  * wakeup task placement or not. This is limited to situations where
@@ -8880,6 +8881,7 @@ pick_cpu:
 
 	return new_cpu;
 }
+#endif
 
 /*
  * Called immediately before a task is migrated to a new cpu; task_cpu(p) and
@@ -13168,12 +13170,6 @@ static unsigned int get_rr_interval_fair(struct rq *rq, struct task_struct *task
 
 #ifdef CONFIG_SCHED_CASS
 #include "cass.c"
-
-/* Use CASS. A dummy wrapper ensures the replaced function is still "used". */
-static inline void *select_task_rq_fair_dummy(void)
-{
-	return (void *)select_task_rq_fair;
-}
 #define select_task_rq_fair cass_select_task_rq_fair
 #endif /* CONFIG_SCHED_CASS */
 
