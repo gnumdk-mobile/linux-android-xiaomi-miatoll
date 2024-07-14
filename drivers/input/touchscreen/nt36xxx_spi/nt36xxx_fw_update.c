@@ -317,6 +317,7 @@ static int32_t update_firmware_request(char *filename)
 
 		ret = request_firmware(&fw_entry, filename, &ts->client->dev);
 		if (ret) {
+			msleep(250);
 			NVT_ERR("firmware load failed, ret=%d\n", ret);
 			goto request_fail;
 		}
@@ -354,7 +355,7 @@ invalid:
 
 request_fail:
 		retry++;
-		if(unlikely(retry > 2)) {
+		if(unlikely(retry > 5)) {
 			NVT_ERR("error, retry=%d\n", retry);
 			break;
 		}
